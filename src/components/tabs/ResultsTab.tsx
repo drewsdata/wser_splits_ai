@@ -1,0 +1,588 @@
+import React, { useMemo } from 'react';
+import { RunnerRecord, ResultFilter, GenderFilter, FinishSummaryRow } from '../../types/wser';
+import { FinishTimeHistogramChart } from '../charts/FinishTimeHistogramChart';
+import { formatHoursToHMS, formatPercent, GENDER_COLORS } from '../../utils/formatters';
+import { calculateStats } from '../../utils/statistics';
+import { Filter, ExternalLink, Download, Trophy, Clock, Users, ArrowUpDown } from 'lucide-react';
+
+interface ResultsTabProps {
+  data: RunnerRecord[];
+  allEntrantsByYear: Map<number, number>;
+  yearBounds: [number, number];
+  ageBounds: [number, number];
+  yearRange: [number, number];
+  setYearRange: (r: [number, number]) => void;
+  gender: GenderFilter;
+  setGender: (g: GenderFilter) => void;
+  result: ResultFilter;
+  setResult: (r: ResultFilter) => void;
+  ageRange: [number, number];
+  setAgeRange: (r: [number, number]) => void;
+}
+
+export const ResultsTab: React.FC<ResultsTabProps> = ({
+  data,
+  allEntrantsByYear,
+  yearBounds,
+  ageBounds,
+  yearRange,
+  setYearRange,
+  gender,
+  setGender,
+  result,
+  setResult,
+  ageRange,
+  setAgeRange,
+}) => {
+  // Filter dataset for Results Tab
+  const filteredData = useMemo(() => {
+    return data.filter((d) => {
+      if (d.y < yearRange[0] || d.y > yearRange[1]) return false;
+      if (d.a !== null && (d.a < ageRange[0] || d.a > ageRange[1])) return false;
+      if (gender !== 'All' && d.g !== gender) return false;
+
+      if (result === 'all_finishes') {
+        return d.rt === 'silver' || d.rt === 'bronze';
+      }
+      if (result === 'silver') {
+        return d.rt === 'silver';
+      }
+      if (result === 'bronze') {
+        return d.rt === 'bronze';
+      }
+      if (result === 'dnf') {
+        return d.rt === 'dnf';
+      }
+      return true;
+    });
+  }, [data, yearRange, ageRange, gender, result]);
+
+  // Compute years in range
+  const selectedYears = useMemo(() => {
+    const list: number[] = [];
+    for (let yr = yearRange[0]; yr <= yearRange[1]; yr++) {
+      if (allEntrantsByYear.has(yr)) list.push(yr);
+    }
+    return list;
+  }, [yearRange, allEntrantsByYear]);
+
+  // Gender counts per year before age filtering (matching R Shiny)
+  const genderCounts = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const d of data) {
+      if (d.y >= yearRange[0] && d.y <= yearRange[1]) {
+        const key = `${d.y}_${d.g}`;
+        map.set(key, (map.get(key) || 0) + 1);
+      }
+    }
+    return map;
+  }, [data, yearRange]);
+
+  // Finish Summary Table data (matches finish_summary_table in app.R)
+  const summaryTable = useMemo(() => {
+    const rows: FinishSummaryRow[] = [];
+
+    // Base data with year and age filters applied
+    const baseData = data.filter((d) => {
+      if (d.y < yearRange[0] || d.y > yearRange[1]) return false;
+      if (d.a !== null && (d.a < ageRange[0] || d.a > ageRange[1])) return false;
+      if (gender !== 'All' && d.g !== gender) return false;
+      return true;
+    });
+
+    for (const yr of selectedYears) {
+      const yearAllEntrants = allEntrantsByYear.get(yr) || 0;
+      const yearData = baseData.filter((d) => d.y === yr);
+
+      if (result === 'dnf') {
+        // DNF Table
+        const dnfYearData = yearData.filter((d) => d.rt === 'dnf');
+
+        const gendersToProcess: ('M' | 'F')[] =
+          gender === 'All' ? ['M', 'F'] : [gender as 'M' | 'F'];
+
+        for (const g of gendersToProcess) {
+          const gDnf = dnfYearData.filter((d) => d.g === g).length;
+          const gAllEntrants = genderCounts.get(`${yr}_${g}`) || 0;
+
+          rows.push({
+            year: yr,
+            gender: g === 'M' ? 'Male' : 'Female',
+            dnf_count: gDnf,
+            percent_all: yearAllEntrants > 0 ? gDnf / yearAllEntrants : 0,
+            percent_gender: gAllEntrants > 0 ? gDnf / gAllEntrants : 0,
+          });
+        }
+
+        // Add 'All' group if All selected
+        if (gender === 'All') {
+          const totalDnf = dnfYearData.length;
+          rows.push({
+            year: yr,
+            gender: 'All',
+            dnf_count: totalDnf,
+            percent_all: yearAllEntrants > 0 ? totalDnf / yearAllEntrants : 0,
+          });
+        }
+      } else {
+        // Finishes Table (all_finishes, silver, bronze)
+        const finisherData = yearData.filter((d) => {
+          if (result === 'all_finishes') return d.rt === 'silver' || d.rt === 'bronze';
+          if (result === 'silver') return d.rt === 'silver';
+          if (result === 'bronze') return d.rt === 'bronze';
+          return false;
+        });
+
+        const gendersToProcess: ('M' | 'F')[] =
+          gender === 'All' ? ['M', 'F'] : [gender as 'M' | 'F'];
+
+        for (const g of gendersToProcess) {
+          const gData = finisherData.filter((d) => d.g === g);
+          const gAllEntrants = genderCounts.get(`${yr}_${g}`) || 0;
+          const times = gData.map((d) => d.th as number).filter((v) => v !== null && !isNaN(v));
+          const stats = calculateStats(times);
+
+          rows.push({
+            year: yr,
+            gender: g === 'M' ? 'Male' : 'Female',
+            finishers: gData.length,
+            all_entrants: yearAllEntrants,
+            all_gender: gAllEntrants,
+            percent_all: yearAllEntrants > 0 ? gData.length / yearAllEntrants : 0,
+            percent_gender: gAllEntrants > 0 ? gData.length / gAllEntrants : 0,
+            avg_time: stats ? formatHoursToHMS(stats.mean) : '-',
+            median_time: stats ? formatHoursToHMS(stats.median) : '-',
+            min_time: stats ? formatHoursToHMS(stats.min) : '-',
+            max_time: stats ? formatHoursToHMS(stats.max) : '-',
+          });
+        }
+
+        if (gender === 'All') {
+          const times = finisherData.map((d) => d.th as number).filter((v) => v !== null && !isNaN(v));
+          const stats = calculateStats(times);
+
+          rows.push({
+            year: yr,
+            gender: 'All',
+            finishers: finisherData.length,
+            all_entrants: yearAllEntrants,
+            percent_all: yearAllEntrants > 0 ? finisherData.length / yearAllEntrants : 0,
+            avg_time: stats ? formatHoursToHMS(stats.mean) : '-',
+            median_time: stats ? formatHoursToHMS(stats.median) : '-',
+            min_time: stats ? formatHoursToHMS(stats.min) : '-',
+            max_time: stats ? formatHoursToHMS(stats.max) : '-',
+          });
+        }
+      }
+    }
+
+    // Sort order: year ascending, gender "All" first, then Male, Female
+    rows.sort((a, b) => {
+      if (a.year !== b.year) return a.year - b.year;
+      if (a.gender === 'All') return -1;
+      if (b.gender === 'All') return 1;
+      return a.gender.localeCompare(b.gender);
+    });
+
+    return rows;
+  }, [data, selectedYears, allEntrantsByYear, genderCounts, yearRange, ageRange, gender, result]);
+
+  // Export summary table to CSV
+  const handleExportCSV = () => {
+    if (summaryTable.length === 0) return;
+    const isDnf = result === 'dnf';
+    const headers = isDnf
+      ? ['Year', 'Gender', 'DNF Count', gender === 'All' ? '% of All Entrants' : '% of Gender Entrants']
+      : [
+          'Year',
+          'Gender',
+          'Finishers',
+          'All Entrants',
+          gender === 'All' ? '% of All Entrants' : '% of Gender Entrants',
+          'Avg Time',
+          'Median Time',
+          'Min Time',
+          'Max Time',
+        ];
+
+    const csvRows = [headers.join(',')];
+    for (const r of summaryTable) {
+      if (isDnf) {
+        csvRows.push(
+          [
+            r.year,
+            r.gender,
+            r.dnf_count,
+            gender === 'All' ? formatPercent(r.percent_all) : formatPercent(r.percent_gender),
+          ].join(',')
+        );
+      } else {
+        csvRows.push(
+          [
+            r.year,
+            r.gender,
+            r.finishers,
+            r.all_entrants,
+            gender === 'All' ? formatPercent(r.percent_all) : formatPercent(r.percent_gender),
+            r.avg_time,
+            r.median_time,
+            r.min_time,
+            r.max_time,
+          ].join(',')
+        );
+      }
+    }
+
+    const blob = new Blob([csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `wser_results_summary_${yearRange[0]}_${yearRange[1]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      {/* Sidebar Controls */}
+      <div className="lg:col-span-4 bg-white p-5 rounded-xl border border-slate-200 shadow-xs space-y-5">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <h3 className="font-bold text-slate-800 text-sm flex items-center gap-1.5">
+            <Filter className="w-4 h-4 text-sky-600" />
+            Filter Results
+          </h3>
+          <span className="text-xs font-mono text-slate-500">
+            {filteredData.length} records matching
+          </span>
+        </div>
+
+        {/* Year Range Slider */}
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between text-xs">
+            <label className="font-semibold text-slate-700">Select Years:</label>
+            <span className="font-mono font-bold text-sky-700 bg-sky-50 px-2 py-0.5 rounded border border-sky-200">
+              {yearRange[0]} – {yearRange[1]}
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <input
+              type="range"
+              min={yearBounds[0]}
+              max={yearBounds[1]}
+              value={yearRange[0]}
+              onChange={(e) => {
+                const val = Number(e.target.value);
+                setYearRange([Math.min(val, yearRange[1]), yearRange[1]]);
+              }}
+              className="w-full accent-sky-600 cursor-pointer"
+            />
+            <input
+              type="range"
+              min={yearBounds[0]}
+              max={yearBounds[1]}
+              value={yearRange[1]}
+              onChange={(e) => {
+                const val = Number(e.target.value);
+                setYearRange([yearRange[0], Math.max(val, yearRange[0])]);
+              }}
+              className="w-full accent-sky-600 cursor-pointer"
+            />
+          </div>
+          <div className="flex justify-between text-[10px] text-slate-400 font-mono">
+            <span>{yearBounds[0]}</span>
+            <span>{yearBounds[1]}</span>
+          </div>
+        </div>
+
+        {/* Flex container for Gender and Result selector */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+          {/* Gender Selector */}
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-slate-700 block">Select Gender:</label>
+            <div className="space-y-1.5">
+              {(['All', 'F', 'M'] as GenderFilter[]).map((g) => (
+                <label
+                  key={g}
+                  className={`flex items-center gap-2 p-2 rounded-lg border text-xs cursor-pointer transition-all ${
+                    gender === g
+                      ? 'bg-sky-50/80 border-sky-400 text-slate-900 font-semibold shadow-2xs'
+                      : 'border-slate-200 hover:bg-slate-50 text-slate-700'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="gender_results"
+                    value={g}
+                    checked={gender === g}
+                    onChange={() => setGender(g)}
+                    className="accent-sky-600"
+                  />
+                  <span
+                    className="w-2 h-2 rounded-full"
+                    style={{ backgroundColor: GENDER_COLORS[g] }}
+                  />
+                  <span>{g === 'All' ? 'All' : g === 'F' ? 'Female' : 'Male'}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Result Selector */}
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-slate-700 block">Select Result:</label>
+            <div className="space-y-1.5">
+              {[
+                { key: 'all_finishes', label: 'All finishes' },
+                { key: 'bronze', label: 'Bronze (24-30h)' },
+                { key: 'silver', label: 'Silver (<24h)' },
+                { key: 'dnf', label: 'DNF' },
+              ].map((res) => (
+                <label
+                  key={res.key}
+                  className={`flex items-center gap-2 p-2 rounded-lg border text-xs cursor-pointer transition-all ${
+                    result === res.key
+                      ? 'bg-sky-50/80 border-sky-400 text-slate-900 font-semibold shadow-2xs'
+                      : 'border-slate-200 hover:bg-slate-50 text-slate-700'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="result_filter"
+                    value={res.key}
+                    checked={result === res.key as ResultFilter}
+                    onChange={() => setResult(res.key as ResultFilter)}
+                    className="accent-sky-600"
+                  />
+                  <span>{res.label}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Age Range Slider */}
+        <div className="space-y-1.5 pt-2 border-t border-slate-100">
+          <div className="flex items-center justify-between text-xs">
+            <label className="font-semibold text-slate-700">Age Range:</label>
+            <span className="font-mono font-bold text-sky-700 bg-sky-50 px-2 py-0.5 rounded border border-sky-200">
+              {ageRange[0]} – {ageRange[1]} yrs
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <input
+              type="range"
+              min={ageBounds[0]}
+              max={ageBounds[1]}
+              value={ageRange[0]}
+              onChange={(e) => {
+                const val = Number(e.target.value);
+                setAgeRange([Math.min(val, ageRange[1]), ageRange[1]]);
+              }}
+              className="w-full accent-sky-600 cursor-pointer"
+            />
+            <input
+              type="range"
+              min={ageBounds[0]}
+              max={ageBounds[1]}
+              value={ageRange[1]}
+              onChange={(e) => {
+                const val = Number(e.target.value);
+                setAgeRange([ageRange[0], Math.max(val, ageRange[0])]);
+              }}
+              className="w-full accent-sky-600 cursor-pointer"
+            />
+          </div>
+          <div className="flex justify-between text-[10px] text-slate-400 font-mono">
+            <span>{ageBounds[0]} yrs</span>
+            <span>{ageBounds[1]} yrs</span>
+          </div>
+        </div>
+
+        {/* Colored divider matching R Shiny */}
+        <div className="border-b-4 border-sky-400/80 my-4" />
+
+        {/* Time Perspective Note from original app.R */}
+        <div className="bg-slate-50 p-4 rounded-xl border border-slate-200/90 text-xs text-slate-600 space-y-2.5">
+          <p className="font-bold text-slate-800 text-sm">
+            Time is the story we tell ourselves about the world:
+          </p>
+          <p className="leading-relaxed">
+            Race outcomes in ultra marathons depend on numerous interconnected variables that might include:
+          </p>
+          <ul className="list-disc pl-4 space-y-1 text-slate-600">
+            <li>Physical factors: training volume, nutrition, hydration, sleep quality</li>
+            <li>Environmental conditions: temperature, humidity, altitude, terrain</li>
+            <li>Mental states: confidence, stress levels, motivation</li>
+            <li>Race-specific elements: pacing strategy, gear choices, crew support</li>
+            <li>Life context: work-life balance, family support, overall stress levels</li>
+          </ul>
+          <p className="leading-relaxed pt-1">
+            Given these complexities, fixating on results like finish times or placing can create unsatisfying experiences. The rare opportunity to participate in a special event like the{' '}
+            <a
+              href="https://www.wser.org/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sky-600 hover:text-sky-800 font-medium hover:underline inline-flex items-center gap-0.5"
+            >
+              WSER
+              <ExternalLink className="w-2.5 h-2.5" />
+            </a>{' '}
+            may best be appreciated and remembered by enjoying the entire process and journey regardless of the outcome.
+          </p>
+        </div>
+      </div>
+
+      {/* Main Panel */}
+      <div className="lg:col-span-8 space-y-6">
+        {/* Plot Component */}
+        <FinishTimeHistogramChart
+          data={filteredData}
+          allEntrantsByYear={allEntrantsByYear}
+          resultFilter={result}
+          genderFilter={gender}
+          selectedYears={selectedYears}
+        />
+
+        {/* Finish Summary Table */}
+        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
+            <div>
+              <h3 className="text-base font-bold text-slate-800 flex items-center gap-2">
+                <Trophy className="w-4 h-4 text-amber-500" />
+                {result === 'dnf' ? 'DNF Summary by Year' : 'Finish Summary Table'}
+              </h3>
+              <p className="text-xs text-slate-500">
+                Aggregated finisher counts, completion percentages and finish time statistics
+              </p>
+            </div>
+            <button
+              onClick={handleExportCSV}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-xs font-medium text-slate-700 shadow-2xs transition-colors cursor-pointer"
+            >
+              <Download className="w-3.5 h-3.5 text-slate-500" />
+              Export CSV
+            </button>
+          </div>
+
+          <div className="overflow-x-auto border border-slate-200 rounded-lg">
+            <table className="w-full text-xs text-left border-collapse">
+              <thead className="bg-slate-100 text-slate-700 font-semibold border-b border-slate-200 uppercase text-[10px] tracking-wider">
+                <tr>
+                  <th className="py-2.5 px-3 text-center">Year</th>
+                  <th className="py-2.5 px-3 text-center">Gender</th>
+                  {result === 'dnf' ? (
+                    <>
+                      <th className="py-2.5 px-3 text-center">DNF Count</th>
+                      <th className="py-2.5 px-3 text-center">
+                        {gender === 'All' ? '% of All Entrants' : '% of Gender Entrants'}
+                      </th>
+                    </>
+                  ) : (
+                    <>
+                      <th className="py-2.5 px-3 text-center">Finishers</th>
+                      <th className="py-2.5 px-3 text-center">
+                        {gender === 'All' ? 'All Entrants' : 'Gender Entrants'}
+                      </th>
+                      <th className="py-2.5 px-3 text-center">
+                        {gender === 'All' ? '% of All' : '% of Gender'}
+                      </th>
+                      <th className="py-2.5 px-3 text-center">Avg Time</th>
+                      <th className="py-2.5 px-3 text-center">Median Time</th>
+                      <th className="py-2.5 px-3 text-center">Min Time</th>
+                      <th className="py-2.5 px-3 text-center">Max Time</th>
+                    </>
+                  )}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 font-mono text-[11px]">
+                {summaryTable.length === 0 ? (
+                  <tr>
+                    <td colSpan={result === 'dnf' ? 4 : 9} className="py-8 text-center text-slate-400 font-sans">
+                      No summary data available for current selection
+                    </td>
+                  </tr>
+                ) : (
+                  summaryTable.map((row, idx) => {
+                    const isAll = row.gender === 'All';
+                    return (
+                      <tr
+                        key={idx}
+                        className={`transition-colors hover:bg-slate-50 ${
+                          isAll ? 'bg-slate-50/70 font-semibold text-slate-900' : 'text-slate-700'
+                        }`}
+                      >
+                        <td className="py-2 px-3 text-center font-sans font-medium text-slate-800">
+                          {row.year}
+                        </td>
+                        <td className="py-2 px-3 text-center">
+                          <span
+                            className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-sans font-medium ${
+                              isAll
+                                ? 'bg-slate-200 text-slate-800'
+                                : row.gender === 'Male'
+                                ? 'bg-sky-100 text-sky-800'
+                                : 'bg-rose-100 text-rose-800'
+                            }`}
+                          >
+                            <span
+                              className="w-1.5 h-1.5 rounded-full"
+                              style={{
+                                backgroundColor:
+                                  row.gender === 'Male'
+                                    ? GENDER_COLORS.M
+                                    : row.gender === 'Female'
+                                    ? GENDER_COLORS.F
+                                    : GENDER_COLORS.All,
+                              }}
+                            />
+                            {row.gender}
+                          </span>
+                        </td>
+                        {result === 'dnf' ? (
+                          <>
+                            <td className="py-2 px-3 text-center font-bold text-rose-700">
+                              {row.dnf_count}
+                            </td>
+                            <td className="py-2 px-3 text-center">
+                              {gender === 'All'
+                                ? formatPercent(row.percent_all)
+                                : formatPercent(row.percent_gender)}
+                            </td>
+                          </>
+                        ) : (
+                          <>
+                            <td className="py-2 px-3 text-center font-bold text-slate-800">
+                              {row.finishers}
+                            </td>
+                            <td className="py-2 px-3 text-center text-slate-500">
+                              {gender === 'All' ? row.all_entrants : row.all_gender}
+                            </td>
+                            <td className="py-2 px-3 text-center font-semibold text-sky-700">
+                              {gender === 'All'
+                                ? formatPercent(row.percent_all)
+                                : formatPercent(row.percent_gender)}
+                            </td>
+                            <td className="py-2 px-3 text-center text-slate-700">{row.avg_time}</td>
+                            <td className="py-2 px-3 text-center text-purple-700 font-semibold">
+                              {row.median_time}
+                            </td>
+                            <td className="py-2 px-3 text-center text-blue-700 font-semibold">
+                              {row.min_time}
+                            </td>
+                            <td className="py-2 px-3 text-center text-emerald-700">
+                              {row.max_time}
+                            </td>
+                          </>
+                        )}
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};

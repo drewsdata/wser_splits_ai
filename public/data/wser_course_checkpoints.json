@@ -1,0 +1,156 @@
+[
+  {
+    "Checkpoint": "Olympic Valley",
+    "Miles": "0",
+    "Km": "0",
+    "Miles to next": "10.3",
+    "Km to next": "16.6"
+  },
+  {
+    "Checkpoint": "Lyon Ridge",
+    "Miles": "10.3",
+    "Km": "16.6",
+    "Miles to next": "5.5",
+    "Km to next": "8.8"
+  },
+  {
+    "Checkpoint": "Red Star Ridge",
+    "Miles": "15.8",
+    "Km": "25.4",
+    "Miles to next": "8.6",
+    "Km to next": "13.9"
+  },
+  {
+    "Checkpoint": "Duncan Canyon",
+    "Miles": "24.4",
+    "Km": "39.3",
+    "Miles to next": "5.9",
+    "Km to next": "9.5"
+  },
+  {
+    "Checkpoint": "Robinson Flat",
+    "Miles": "30.3",
+    "Km": "48.8",
+    "Miles to next": "4.1",
+    "Km to next": "6.6"
+  },
+  {
+    "Checkpoint": "Miller's Defeat",
+    "Miles": "34.4",
+    "Km": "55.4",
+    "Miles to next": "3.6",
+    "Km to next": "5.8"
+  },
+  {
+    "Checkpoint": "Dusty Corners",
+    "Miles": "38",
+    "Km": "61.2",
+    "Miles to next": "5.3",
+    "Km to next": "8.5"
+  },
+  {
+    "Checkpoint": "Last Chance",
+    "Miles": "43.3",
+    "Km": "69.7",
+    "Miles to next": "4.5",
+    "Km to next": "7.2"
+  },
+  {
+    "Checkpoint": "Devil's Thumb",
+    "Miles": "47.8",
+    "Km": "76.9",
+    "Miles to next": "5.1",
+    "Km to next": "8.2"
+  },
+  {
+    "Checkpoint": "El Dorado Creek",
+    "Miles": "52.9",
+    "Km": "85.1",
+    "Miles to next": "2.8",
+    "Km to next": "4.5"
+  },
+  {
+    "Checkpoint": "Michigan Bluff",
+    "Miles": "55.7",
+    "Km": "89.6",
+    "Miles to next": "6.3",
+    "Km to next": "10.2"
+  },
+  {
+    "Checkpoint": "Foresthill *",
+    "Miles": "62",
+    "Km": "99.8",
+    "Miles to next": "8.7",
+    "Km to next": "14"
+  },
+  {
+    "Checkpoint": "Dardanelles (Cal-1) [Not in this data set]",
+    "Miles": "65.7",
+    "Km": "105.7",
+    "Miles to next": "5",
+    "Km to next": "8.1"
+  },
+  {
+    "Checkpoint": "Peachstone (Cal-2) *",
+    "Miles": "70.7",
+    "Km": "113.8",
+    "Miles to next": "7.3",
+    "Km to next": "11.7"
+  },
+  {
+    "Checkpoint": "Ford's Bar (Cal-3) [Not in this data set]",
+    "Miles": "73",
+    "Km": "117.4",
+    "Miles to next": "5",
+    "Km to next": "8.1"
+  },
+  {
+    "Checkpoint": "Rucky Chucky",
+    "Miles": "78",
+    "Km": "125.5",
+    "Miles to next": "1.8",
+    "Km to next": "2.9"
+  },
+  {
+    "Checkpoint": "Green Gate",
+    "Miles": "79.8",
+    "Km": "128.4",
+    "Miles to next": "5.4",
+    "Km to next": "8.7"
+  },
+  {
+    "Checkpoint": "Auburn Lake Trails",
+    "Miles": "85.2",
+    "Km": "137.1",
+    "Miles to next": "5.5",
+    "Km to next": "8.9"
+  },
+  {
+    "Checkpoint": "Quarry Rd",
+    "Miles": "90.7",
+    "Km": "146",
+    "Miles to next": "3.6",
+    "Km to next": "5.8"
+  },
+  {
+    "Checkpoint": "Pointed Rocks",
+    "Miles": "94.3",
+    "Km": "151.8",
+    "Miles to next": "4.6",
+    "Km to next": "7.4"
+  },
+  {
+    "Checkpoint": "Robie Point",
+    "Miles": "98.9",
+    "Km": "159.2",
+    "Miles to next": "1.3",
+    "Km to next": "2.1"
+  },
+  {
+    "Checkpoint": "Placer High School",
+    "Miles": "100.2",
+    "Km": "161.3",
+    "Miles to next": "0",
+    "Km to next": "0"
+  }
+]

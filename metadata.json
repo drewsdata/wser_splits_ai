@@ -1,0 +1,8 @@
+{
+  "name": "WSER Timing Data Analysis",
+  "description": "Interactive analytics portfolio for Western States Endurance Run (WSER) splits, checkpoint pacing, finisher distributions, and runner statistics (2017-2026).",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
