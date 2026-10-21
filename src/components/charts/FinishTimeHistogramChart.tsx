@@ -155,7 +155,7 @@ export const FinishTimeHistogramChart: React.FC<FinishTimeHistogramChartProps> =
               return (
                 <g key={item.year}>
                   {series.map((s, sIdx) => {
-                    const bHeight = Math.max(2, (s.count / maxCount) * plotH);
+                    const bHeight = s.count > 0 ? Math.max(3, (s.count / maxCount) * plotH) : 0;
                     const bX = startX + sIdx * barW;
                     const bY = chartHeight - padding.bottom - bHeight;
 

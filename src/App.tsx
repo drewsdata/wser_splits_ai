@@ -158,6 +158,7 @@ export default function App() {
         {activeTab === 'results' && (
           <ResultsTab
             data={data}
+            checkpoints={checkpoints}
             allEntrantsByYear={allEntrantsByYear}
             yearBounds={yearBounds}
             ageBounds={ageBounds}
