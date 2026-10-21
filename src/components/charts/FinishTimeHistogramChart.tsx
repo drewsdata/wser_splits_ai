@@ -30,24 +30,35 @@ export const FinishTimeHistogramChart: React.FC<FinishTimeHistogramChartProps> =
     y: number;
   } | null>(null);
 
+  // DNF data memo (unconditionally declared at top level)
+  const dnfByYear = useMemo(() => {
+    const sortedYears = [...selectedYears].sort((a, b) => a - b);
+    return sortedYears.map((yr) => {
+      const yearRecords = data.filter((d) => d.y === yr && d.rt === 'dnf');
+      const mCount = yearRecords.filter((d) => d.g === 'M').length;
+      const fCount = yearRecords.filter((d) => d.g === 'F').length;
+      const allCount = yearRecords.length;
+      return {
+        year: yr,
+        M: mCount,
+        F: fCount,
+        All: allCount,
+      };
+    });
+  }, [data, selectedYears]);
+
+  // Finish data memo (unconditionally declared at top level)
+  const finishData = useMemo(() => {
+    return data.filter((d) => d.th !== null && d.th >= 12 && d.th <= 32);
+  }, [data]);
+
+  // Sorted years list memo (unconditionally declared at top level)
+  const yearsList = useMemo(() => {
+    return [...selectedYears].sort((a, b) => a - b);
+  }, [selectedYears]);
+
   // If result is DNF: Render grouped/dodged bar chart of DNF by Year
   if (resultFilter === 'dnf') {
-    const dnfByYear = useMemo(() => {
-      const sortedYears = [...selectedYears].sort((a, b) => a - b);
-      return sortedYears.map((yr) => {
-        const yearRecords = data.filter((d) => d.y === yr && d.rt === 'dnf');
-        const mCount = yearRecords.filter((d) => d.g === 'M').length;
-        const fCount = yearRecords.filter((d) => d.g === 'F').length;
-        const allCount = yearRecords.length;
-        return {
-          year: yr,
-          M: mCount,
-          F: fCount,
-          All: allCount,
-        };
-      });
-    }, [data, selectedYears]);
-
     const maxCount = Math.max(
       10,
       ...dnfByYear.map((d) => (genderFilter === 'All' ? Math.max(d.All, d.M, d.F) : d[genderFilter]))
@@ -213,15 +224,6 @@ export const FinishTimeHistogramChart: React.FC<FinishTimeHistogramChartProps> =
       </div>
     );
   }
-
-  // Result is finishes: Show Histogram of Finish Times
-  const finishData = useMemo(() => {
-    return data.filter((d) => d.th !== null && d.th >= 12 && d.th <= 32);
-  }, [data]);
-
-  const yearsList = useMemo(() => {
-    return [...selectedYears].sort((a, b) => a - b);
-  }, [selectedYears]);
 
   return (
     <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs space-y-4">
