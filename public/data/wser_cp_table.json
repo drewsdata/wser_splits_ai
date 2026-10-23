@@ -1,142 +1,142 @@
 [
   {
     "cp_column": "olympic_valley",
-    "cp_number": "1",
-    "cp_miles": "0",
-    "cp_kilometers": "0",
+    "cp_number": 1,
+    "cp_miles": 0.0,
+    "cp_kilometers": 0.0,
     "cp_display_name": "Olympic Valley (0.0M : 0.0K)"
   },
   {
     "cp_column": "lyon_ridge",
-    "cp_number": "2",
-    "cp_miles": "10.3",
-    "cp_kilometers": "16.6",
+    "cp_number": 2,
+    "cp_miles": 10.3,
+    "cp_kilometers": 16.6,
     "cp_display_name": "Lyon Ridge (10.3M : 16.6K)"
   },
   {
     "cp_column": "red_star_ridge",
-    "cp_number": "3",
-    "cp_miles": "15.8",
-    "cp_kilometers": "25.4",
+    "cp_number": 3,
+    "cp_miles": 15.8,
+    "cp_kilometers": 25.4,
     "cp_display_name": "Red Star Ridge  (15.8M : 25.4K)"
   },
   {
     "cp_column": "duncan_canyon",
-    "cp_number": "4",
-    "cp_miles": "24.4",
-    "cp_kilometers": "39.3",
+    "cp_number": 4,
+    "cp_miles": 24.4,
+    "cp_kilometers": 39.3,
     "cp_display_name": "Duncan Canyon  (24.4M : 39.3K)"
   },
   {
     "cp_column": "robinson_flat",
-    "cp_number": "5",
-    "cp_miles": "30.3",
-    "cp_kilometers": "48.8",
+    "cp_number": 5,
+    "cp_miles": 30.3,
+    "cp_kilometers": 48.8,
     "cp_display_name": "Robinson Flat  (30.3M : 48.8K)"
   },
   {
     "cp_column": "millers_defeat",
-    "cp_number": "6",
-    "cp_miles": "34.4",
-    "cp_kilometers": "55.4",
+    "cp_number": 6,
+    "cp_miles": 34.4,
+    "cp_kilometers": 55.4,
     "cp_display_name": "Miller's Defeat  (34.4M : 55.4K)"
   },
   {
     "cp_column": "dusty_corners",
-    "cp_number": "7",
-    "cp_miles": "38",
-    "cp_kilometers": "61.2",
+    "cp_number": 7,
+    "cp_miles": 38.0,
+    "cp_kilometers": 61.2,
     "cp_display_name": "Dusty Corners  (38M : 61.2K)"
   },
   {
     "cp_column": "last_chance",
-    "cp_number": "8",
-    "cp_miles": "43.3",
-    "cp_kilometers": "69.7",
+    "cp_number": 8,
+    "cp_miles": 43.3,
+    "cp_kilometers": 69.7,
     "cp_display_name": "Last Chance  (43.3M : 69.7K)"
   },
   {
     "cp_column": "devils_thumb",
-    "cp_number": "9",
-    "cp_miles": "47.8",
-    "cp_kilometers": "76.9",
+    "cp_number": 9,
+    "cp_miles": 47.8,
+    "cp_kilometers": 76.9,
     "cp_display_name": "Devil's Thumb  (47.8M : 76.9K)"
   },
   {
     "cp_column": "el_dorado_creek",
-    "cp_number": "10",
-    "cp_miles": "52.9",
-    "cp_kilometers": "85.1",
+    "cp_number": 10,
+    "cp_miles": 52.9,
+    "cp_kilometers": 85.1,
     "cp_display_name": "El Dorado Creek (52.9M : 85.1K)"
   },
   {
     "cp_column": "michigan_bluff",
-    "cp_number": "11",
-    "cp_miles": "55.7",
-    "cp_kilometers": "89.6",
+    "cp_number": 11,
+    "cp_miles": 55.7,
+    "cp_kilometers": 89.6,
     "cp_display_name": "Michigan Bluff  (55.7M : 89.6K)"
   },
   {
     "cp_column": "foresthill",
-    "cp_number": "12",
-    "cp_miles": "62",
-    "cp_kilometers": "99.8",
+    "cp_number": 12,
+    "cp_miles": 62.0,
+    "cp_kilometers": 99.8,
     "cp_display_name": "Foresthill  (62M : 99.8K)"
   },
   {
     "cp_column": "peachstone_cal_2",
-    "cp_number": "13",
-    "cp_miles": "70.7",
-    "cp_kilometers": "113.8",
+    "cp_number": 13,
+    "cp_miles": 70.7,
+    "cp_kilometers": 113.8,
     "cp_display_name": "Peachstone (Cal-2)  (70.7M : 113.8K)"
   },
   {
     "cp_column": "rucky_chucky",
-    "cp_number": "14",
-    "cp_miles": "78",
-    "cp_kilometers": "125.5",
+    "cp_number": 14,
+    "cp_miles": 78.0,
+    "cp_kilometers": 125.5,
     "cp_display_name": "Rucky Chucky  (78M : 125.5K)"
   },
   {
     "cp_column": "green_gate",
-    "cp_number": "15",
-    "cp_miles": "79.8",
-    "cp_kilometers": "128.4",
+    "cp_number": 15,
+    "cp_miles": 79.8,
+    "cp_kilometers": 128.4,
     "cp_display_name": "Green Gate  (79.8M : 128.4K)"
   },
   {
     "cp_column": "auburn_lake_trails",
-    "cp_number": "16",
-    "cp_miles": "85.2",
-    "cp_kilometers": "137.1",
+    "cp_number": 16,
+    "cp_miles": 85.2,
+    "cp_kilometers": 137.1,
     "cp_display_name": "Auburn Lake Trails  (85.2M : 137.1K)"
   },
   {
     "cp_column": "quarry_road",
-    "cp_number": "17",
-    "cp_miles": "90.7",
-    "cp_kilometers": "146",
+    "cp_number": 17,
+    "cp_miles": 90.7,
+    "cp_kilometers": 146.0,
     "cp_display_name": "Quarry Road  (90.7M : 146K)"
   },
   {
     "cp_column": "pointed_rocks",
-    "cp_number": "18",
-    "cp_miles": "94.3",
-    "cp_kilometers": "151.8",
+    "cp_number": 18,
+    "cp_miles": 94.3,
+    "cp_kilometers": 151.8,
     "cp_display_name": "Pointed Rocks  (94.3M : 151.8K)"
   },
   {
     "cp_column": "robie_point",
-    "cp_number": "19",
-    "cp_miles": "98.9",
-    "cp_kilometers": "159.2",
+    "cp_number": 19,
+    "cp_miles": 98.9,
+    "cp_kilometers": 159.2,
     "cp_display_name": "Robie Point  (98.9M : 159.2K)"
   },
   {
     "cp_column": "finish",
-    "cp_number": "20",
-    "cp_miles": "100.2",
-    "cp_kilometers": "161.3",
+    "cp_number": 20,
+    "cp_miles": 100.2,
+    "cp_kilometers": 161.3,
     "cp_display_name": "Finish (Placer H.S. Track)  (100.2M : 161.3K)"
   }
 ]

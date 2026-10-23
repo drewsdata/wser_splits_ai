@@ -53,14 +53,31 @@ export const SplitsTab: React.FC<SplitsTabProps> = ({
 
   // End checkpoint options: must have cp_number > start_cp_number
   const endOptions = useMemo(() => {
-    return checkpoints.filter((cp) => cp.cp_number > startCp.cp_number);
+    if (!startCp) return [];
+    return checkpoints.filter((cp) => Number(cp.cp_number) > Number(startCp.cp_number));
   }, [checkpoints, startCp]);
 
-  // Ensure end checkpoint is valid when start checkpoint changes
+  // Automatically update End Checkpoint to the immediate next checkpoint when Start changes
+  const handleStartCheckpointChange = (newStartCol: string) => {
+    setStartCpCol(newStartCol);
+    const newStartCp = checkpoints.find((cp) => cp.cp_column === newStartCol);
+    if (newStartCp) {
+      const validEnds = checkpoints.filter(
+        (cp) => Number(cp.cp_number) > Number(newStartCp.cp_number)
+      );
+      if (validEnds.length > 0) {
+        setEndCpCol(validEnds[0].cp_column);
+      }
+    }
+  };
+
+  // Ensure end checkpoint is valid when endOptions change
   useEffect(() => {
-    const isCurrentValid = endOptions.some((cp) => cp.cp_column === endCpCol);
-    if (!isCurrentValid && endOptions.length > 0) {
-      setEndCpCol(endOptions[0].cp_column);
+    if (endOptions.length > 0) {
+      const isCurrentValid = endOptions.some((cp) => cp.cp_column === endCpCol);
+      if (!isCurrentValid) {
+        setEndCpCol(endOptions[0].cp_column);
+      }
     }
   }, [endOptions, endCpCol]);
 
@@ -368,7 +385,7 @@ export const SplitsTab: React.FC<SplitsTabProps> = ({
             </label>
             <select
               value={startCpCol}
-              onChange={(e) => setStartCpCol(e.target.value)}
+              onChange={(e) => handleStartCheckpointChange(e.target.value)}
               className="w-full text-xs py-2 px-2.5 rounded-lg border border-slate-300 bg-white shadow-2xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer"
             >
               {startOptions.map((cp) => (
