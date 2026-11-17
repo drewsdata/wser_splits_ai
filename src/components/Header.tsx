@@ -60,7 +60,7 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* Quick Metrics */}
-          <div className="flex items-center gap-3 text-xs">
+          <div className="flex flex-wrap items-center gap-3 text-xs">
             <div className="bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600">
               <span className="text-[11px] text-slate-400 block font-sans">Total Records</span>
               <span className="font-mono font-bold text-slate-800 text-sm">
@@ -69,7 +69,9 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
             <div className="bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600">
               <span className="text-[11px] text-slate-400 block font-sans">Course</span>
-              <span className="font-mono font-bold text-slate-800 text-sm">+18,090 ft</span>
+              <span className="font-mono font-bold text-slate-800 text-sm whitespace-nowrap">
+                +18,090 <span className="text-slate-400 font-normal">/</span> -22,970 ft
+              </span>
             </div>
             <div className="bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600">
               <span className="text-[11px] text-slate-400 block font-sans">Olympic Valley to Auburn</span>
